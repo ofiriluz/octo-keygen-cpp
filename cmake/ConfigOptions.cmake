@@ -1,0 +1,1 @@
+OPTION(DISABLE_TESTS "Disable Tests Compilation" OFF)

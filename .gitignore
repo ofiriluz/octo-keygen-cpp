@@ -1,0 +1,5 @@
+build
+install
+.vscode
+.github
+__pycache__

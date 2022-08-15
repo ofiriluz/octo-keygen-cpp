@@ -1,0 +1,17 @@
+---
+Language: Cpp
+BasedOnStyle: Microsoft
+DerivePointerAlignment: false
+PointerAlignment: Left
+SortIncludes: false
+DeriveLineEnding: false
+UseCRLF: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+IndentCaseLabels: true
+BraceWrapping:
+    AfterCaseLabel: true
+    AfterStruct: true
+    AfterUnion: true
+AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: false
+BinPackParameters: false
