@@ -1,6 +1,8 @@
 octo-keygen-cpp
 ================
 
+[![Keygen Linux Build Pipeline](https://github.com/ofiriluz/octo-keygen-cpp/actions/workflows/linux.yml/badge.svg)](https://github.com/ofiriluz/octo-keygen-cpp/actions/workflows/linux.yml)
+
 Key generation library, supports generating of public private key pairs and certificates
 
 Currently it supports generating those keys from:
