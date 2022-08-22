@@ -5,8 +5,11 @@ PROJECT(octo-keygen-cpp)
 # Add CMake options to path
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)
 INCLUDE(ConfigOptions)
-INCLUDE(LoadConanBuildInfo)
-LOAD_CONAN_BUILD_INFO()
+
+FIND_PACKAGE(octo-logger-cpp REQUIRED CONFIG)
+FIND_PACKAGE(octo-encryption-cpp REQUIRED CONFIG)
+FIND_PACKAGE(fmt REQUIRED CONFIG)
+FIND_PACKAGE(OpenSSL REQUIRED CONFIG)
 
 # Sources and definitions
 SET(KEYGEN_SRCS
@@ -42,8 +45,8 @@ TARGET_LINK_LIBRARIES(octo-keygen-cpp
 
     # 3rd Parties
     fmt::fmt
-    openssl::ssl
-    openssl::crypto
+    OpenSSL::SSL
+    OpenSSL::Crypto
 )
 
 # Installation of the keygen library

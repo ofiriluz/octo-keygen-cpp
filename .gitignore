@@ -1,5 +1,5 @@
 build
 install
 .vscode
-.github
 __pycache__
+CMakeUserPresets.json

@@ -1,0 +1,46 @@
+name: windows
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [windows-2019]
+        platform: [Win32, x64]
+        toolset: [v142]
+        build_type: [Debug, Release]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Create Build Environment
+      run: |
+        cmake -E make_directory ${{runner.workspace}}/build
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.8"
+    - name: Install Conan
+      shell: bash
+      run: |
+        pip3 install conan
+    - name: Consume conan
+      working-directory: ${{runner.workspace}}\\build
+      shell: bash
+      run: |
+        conan profile new default --detect
+        conan profile update settings.build_type=${{matrix.build_type}} default
+        conan install $GITHUB_WORKSPACE
+    - name: Build and test conan
+      working-directory: ${{runner.workspace}}\\build
+      shell: bash
+      run: |
+        conan build $GITHUB_WORKSPACE
+    - name: Package conan
+      working-directory: ${{runner.workspace}}\\build
+      shell: bash
+      run: |
+        conan export-pkg $GITHUB_WORKSPACE

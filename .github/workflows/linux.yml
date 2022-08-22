@@ -1,0 +1,43 @@
+name: linux
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build_type: [Debug, Release]
+        os: [ubuntu-20.04]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Create Build Environment
+      run: |
+        ${{matrix.install}}
+        sudo apt update
+        sudo apt install locales-all g++-10
+        cmake -E make_directory ${{runner.workspace}}/build
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.8"
+    - name: Install Conan
+      run: |
+        pip3 install conan
+    - name: Consume conan
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        conan profile new default --detect
+        conan profile update settings.build_type=${{matrix.build_type}} default
+        conan install $GITHUB_WORKSPACE
+    - name: Build and test conan
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        conan build $GITHUB_WORKSPACE
+    - name: Package conan
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        conan export-pkg $GITHUB_WORKSPACE
