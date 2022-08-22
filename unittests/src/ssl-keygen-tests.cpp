@@ -90,14 +90,7 @@ int main(int argc, char** argv)
     octo::logger::Logger logger("PSKeygen");
     std::shared_ptr<octo::logger::ManagerConfig> config =
         std::make_shared<octo::logger::ManagerConfig>();
-    octo::logger::SinkConfig file_writer_sink("File", octo::logger::SinkConfig::SinkType::FILE_SINK);
-    octo::logger::SinkConfig console_writer_sink("Console",
-                                                          octo::logger::SinkConfig::SinkType::CONSOLE_SINK);
-    file_writer_sink.set_option(octo::logger::SinkConfig::SinkOption::FILE_LOG_FILES_PATH,
-                                "/tmp/pskeygen_logs");
-    file_writer_sink.set_option(octo::logger::SinkConfig::SinkOption::FILE_SEPERATE_CHANNEL_FILES, true);
-    file_writer_sink.set_option(octo::logger::SinkConfig::SinkOption::FILE_LOG_FOLDER_PREFIX, "PSKeygen");
-    config->add_sink(file_writer_sink);
+    octo::logger::SinkConfig console_writer_sink("Console", octo::logger::SinkConfig::SinkType::CONSOLE_SINK);
     config->add_sink(console_writer_sink);
     octo::logger::Manager::instance()
         .editable_channel("PSKeygen")
