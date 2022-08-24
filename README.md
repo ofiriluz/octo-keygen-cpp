@@ -2,6 +2,8 @@ octo-keygen-cpp
 ================
 
 [![Keygen Linux Build Pipeline](https://github.com/ofiriluz/octo-keygen-cpp/actions/workflows/linux.yml/badge.svg)](https://github.com/ofiriluz/octo-keygen-cpp/actions/workflows/linux.yml)
+[![Keygen Windows Build Pipeline](https://github.com/ofiriluz/octo-keygen-cpp/actions/workflows/windows.yml/badge.svg)](https://github.com/ofiriluz/octo-keygen-cpp/actions/workflows/windows.yml)
+[![Keygen Mac Build Pipeline](https://github.com/ofiriluz/octo-keygen-cpp/actions/workflows/mac.yml/badge.svg)](https://github.com/ofiriluz/octo-keygen-cpp/actions/workflows/mac.yml)
 
 Key generation library, supports generating of public private key pairs and certificates
 
