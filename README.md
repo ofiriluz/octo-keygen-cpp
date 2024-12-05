@@ -28,7 +28,7 @@ All of which use openssl
 Usage
 =====
 
-In order to use the existing implmenets, and generate keypair and certificates, we can use it as follows with ssl:
+In order to use the existing implements, and generate keypair and certificates, we can use it as follows with ssl:
 
 ```cpp
 octo::keygen::KeygenPtr ssl_key_gen = std::make_shared<octo::keygen::ssl::SSLKeygen>();

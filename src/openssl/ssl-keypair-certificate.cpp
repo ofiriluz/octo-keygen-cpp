@@ -132,8 +132,8 @@ bool SSLKeypairCertificate::is_valid() const
 {
     std::time_t current_time;
     std::time(&current_time);
-    return X509_cmp_time(X509_get_notBefore(certificate_), &current_time) &&
-           X509_cmp_time(X509_get_notAfter(certificate_), &current_time);
+    return (X509_cmp_time(X509_get_notBefore(certificate_), &current_time) == -1 &&
+            X509_cmp_time(X509_get_notAfter(certificate_), &current_time) == 1);
 }
 
 bool SSLKeypairCertificate::is_client_ca() const
