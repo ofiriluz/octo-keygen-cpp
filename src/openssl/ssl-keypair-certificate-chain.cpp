@@ -183,8 +183,8 @@ bool SSLKeypairCertificateChain::is_all_valid() const
     for (int i = 0; i < sk_X509_num(chain_); i++)
     {
         auto cert = sk_X509_value(chain_, i);
-        if (!X509_cmp_time(X509_get_notBefore(cert), &current_time) ||
-            !X509_cmp_time(X509_get_notAfter(cert), &current_time))
+        if (!(X509_cmp_time(X509_get_notBefore(cert), &current_time) == -1 &&
+              X509_cmp_time(X509_get_notAfter(cert), &current_time) == 1))
         {
             return false;
         }
