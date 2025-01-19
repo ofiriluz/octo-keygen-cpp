@@ -26,7 +26,6 @@ namespace octo::keygen::ssl
 static constexpr const char SSLKEYPAIRCERTIFICATE_TAG[] = "SSLKeypairCertificate";
 class SSLKeypairCertificateChain;
 
-enum class  SSLKeypairCertificateFingerPrint
 class SSLKeypairCertificate : public KeypairCertificate
 {
   public:
