@@ -291,18 +291,22 @@ std::string SSLKeypairCertificate::fingerprint(const std::string& algorithm) con
     X509_digest(certificate_, digest, &buffer[0], &hash_size);
     return fmt::format("{:02x}", fmt::join(buffer.cbegin(), buffer.cbegin() + hash_size, ":"));
 }
+
 std::string SSLKeypairCertificate::sha1_fingerprint() const
 {
     return fingerprint("sha1");
 }
+
 std::string SSLKeypairCertificate::sha256_fingerprint() const
 {
     return fingerprint("sha256");
 }
+
 std::string SSLKeypairCertificate::md5_fingerprint() const
 {
     return fingerprint("md5");
 }
+
 std::set<std::string> SSLKeypairCertificate::alternate_names() const
 {
     unsigned char* raw_cert_name = nullptr;
