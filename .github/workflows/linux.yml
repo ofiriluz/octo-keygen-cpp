@@ -26,7 +26,7 @@ jobs:
         python-version: "3.8"
     - name: Install Conan
       run: |
-        pip3 install conan
+        pip3 install "conan<2"
     - name: Consume conan
       working-directory: ${{runner.workspace}}/build
       run: |
