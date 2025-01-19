@@ -17,7 +17,8 @@
 #include <iostream>
 #include <fstream>
 
-
+using SSLKeypairCertificate = octo::keygen::ssl::SSLKeypairCertificate;
+using FingerprintAlgorithm = SSLKeypairCertificate::FingerprintAlgorithm;
 constexpr auto ROOTCA = "-----BEGIN CERTIFICATE-----\n"
                     "MIID4DCCAsigAwIBAgIUSdyfMTrtlHmyB8Jr3/q0YjizVCQwDQYJKoZIhvcNAQEN\n"
                     "BQAwfDELMAkGA1UEBhMCSUwxDzANBgNVBAgMBklzcmFlbDEUMBIGA1UEBwwLUGV0\n"
@@ -103,9 +104,10 @@ int main(int argc, char** argv)
     auto target = octo::keygen::ssl::SSLKeypairCertificate::load_certificate(
         std::make_unique<octo::encryption::SecureString>(TARGET_CERT)
     );
-    logger.info() << "Sha1 Fingerprint" << target->sha1_fingerprint();
-    logger.info() << "Sha256 Fingerprint" << target->sha256_fingerprint();
-    logger.info() << "md5 Fingerprint" << target->md5_fingerprint();
+    logger.info() << "SHA1 Fingerprint" << target->fingerprint(FingerprintAlgorithm::SHA1);
+    logger.info() << "SHA256 Fingerprint" << target->fingerprint(FingerprintAlgorithm::SHA256);
+    logger.info() << "MD5 Fingerprint" << target->fingerprint(FingerprintAlgorithm::MD5);
+    logger.info() << "Fingerprints" << target->fingerprints();
 
     auto chain = octo::keygen::ssl::SSLKeypairCertificateChain::load_certificate_chain(
         std::make_unique<octo::encryption::SecureString>(SUBCA)

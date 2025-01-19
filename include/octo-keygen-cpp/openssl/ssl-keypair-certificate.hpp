@@ -17,6 +17,7 @@
 #include <octo-logger-cpp/logger.hpp>
 #include <regex>
 #include <set>
+#include <unordered_map>
 
 typedef struct x509_st X509;
 
@@ -24,8 +25,18 @@ namespace octo::keygen::ssl
 {
 static constexpr const char SSLKEYPAIRCERTIFICATE_TAG[] = "SSLKeypairCertificate";
 class SSLKeypairCertificateChain;
+
+enum class  SSLKeypairCertificateFingerPrint
 class SSLKeypairCertificate : public KeypairCertificate
 {
+  public:
+    enum class FingerprintAlgorithm : uint8_t
+    {
+        SHA1,
+        SHA256, 
+        MD5      
+    };
+
   private:
     static const std::regex PATTERNED_NAME_REGEX;
 
@@ -73,21 +84,20 @@ class SSLKeypairCertificate : public KeypairCertificate
     [[nodiscard]] std::string subject_common_name() const;
     [[nodiscard]] std::string issuer() const;
     /// @brief Generates the fingerprint of the certificate
-    /// The Algorithm used must be compliant with the digest algorithms supported by OpenSSL.
-    /// runtime_error is thrown if the algorithm is not supported.
-    [[nodiscard]] std::string fingerprint(const char* algorithm) const;
-    [[nodiscard]] std::string fingerprint(const std::string& algorithm) const;
-    /// @brief specializations of commonly used fingerprint algorithms
-    /// The behavior of of <ALGO>_fingerprint is the same as fingerprint(<ALGO>)
-    [[nodiscard]] std::string sha1_fingerprint() const;
-    [[nodiscard]] std::string sha256_fingerprint() const;
-    [[nodiscard]] std::string md5_fingerprint() const;
+    [[nodiscard]] std::string fingerprint(FingerprintAlgorithm algorithm) const;
+    // @brief Generates all the fingerprints of the certificate
+    [[nodiscard]] std::unordered_map<std::string, std::string> fingerprints() const;
 
     [[nodiscard]] std::set<std::string> alternate_names() const;
     [[nodiscard]] std::string identifier() const;
 
     friend class SSLKeygen;
     friend class SSLKeypairCertificateChain;
+
+  private:
+    [[nodiscard]] std::string fingerprint(const char* algorithm) const;
+    [[nodiscard]] static const char* algorithm_to_digest(FingerprintAlgorithm algorithm) const;
+
 };
 typedef std::shared_ptr<SSLKeypairCertificate> SSLKeypairCertificatePtr;
 typedef std::unique_ptr<SSLKeypairCertificate> SSLKeypairCertificateUniquePtr;
