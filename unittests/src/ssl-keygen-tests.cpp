@@ -129,5 +129,5 @@ int main(int argc, char** argv)
     octo::keygen::KeypairCertificatePtr ssl_cert = ssl_key_gen->sign_key_pair(ssl_key_pair, ssl_sign_opts);
     logger.info() << "\n" << ssl_cert->certificate();
     logger.info() << "\n" << ssl_cert->pretty_print_certificate_info();
-    return 1
+    return 1;
 }
