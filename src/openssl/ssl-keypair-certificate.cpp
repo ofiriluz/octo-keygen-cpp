@@ -288,6 +288,10 @@ std::string SSLKeypairCertificate::fingerprint(const char* algorithm) const
     std::uint32_t hash_size;
     auto buffer = std::vector<unsigned char>(EVP_MAX_MD_SIZE);
     auto digest = EVP_get_digestbyname(algorithm);
+    if (!digest)
+    {
+        throw std::runtime_error("Could not get digest for given algorithm");
+    }
     X509_digest(certificate_, digest, &buffer[0], &hash_size);
     return fmt::format("{:02x}", fmt::join(buffer.cbegin(), buffer.cbegin() + hash_size, ":"));
 }

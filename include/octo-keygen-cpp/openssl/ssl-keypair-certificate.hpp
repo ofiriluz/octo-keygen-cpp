@@ -72,11 +72,17 @@ class SSLKeypairCertificate : public KeypairCertificate
     [[nodiscard]] std::string subject_name() const;
     [[nodiscard]] std::string subject_common_name() const;
     [[nodiscard]] std::string issuer() const;
+    /// @brief Generates the fingerprint of the certificate
+    /// The Algorithm used must be compliant with the digest algorithms supported by OpenSSL.
+    /// runtime_error is thrown if the algorithm is not supported.
     [[nodiscard]] std::string fingerprint(const char* algorithm) const;
     [[nodiscard]] std::string fingerprint(const std::string& algorithm) const;
+    /// @brief specializations of commonly used fingerprint algorithms
+    /// The behavior of of <ALGO>_fingerprint is the same as fingerprint(<ALGO>)
     [[nodiscard]] std::string sha1_fingerprint() const;
     [[nodiscard]] std::string sha256_fingerprint() const;
     [[nodiscard]] std::string md5_fingerprint() const;
+
     [[nodiscard]] std::set<std::string> alternate_names() const;
     [[nodiscard]] std::string identifier() const;
 
