@@ -107,7 +107,7 @@ int main(int argc, char** argv)
     logger.info() << "SHA1 Fingerprint" << target->fingerprint(FingerprintAlgorithm::SHA1);
     logger.info() << "SHA256 Fingerprint" << target->fingerprint(FingerprintAlgorithm::SHA256);
     logger.info() << "MD5 Fingerprint" << target->fingerprint(FingerprintAlgorithm::MD5);
-    for const auto& [key, value] : target->fingerprints()
+    for (const auto& [key, value] : target->fingerprints())
     {
         logger.info() << key << " = " << value;
     }
