@@ -304,7 +304,7 @@ std::string SSLKeypairCertificate::fingerprints(SSLKeypairCertificate::Fingerpri
             {"MD5", fingerprint(FingerprintAlgorithm::MD5)}};
 }
 
-const char* SSLKeypairCertificate::algorithm_to_digest(SSLKeypairCertificate::FingerprintAlgorithm algorithm) const
+const char* SSLKeypairCertificate::algorithm_to_digest(SSLKeypairCertificate::FingerprintAlgorithm algorithm)
 {
     switch (algorithm)
     {

@@ -96,7 +96,7 @@ class SSLKeypairCertificate : public KeypairCertificate
 
   private:
     [[nodiscard]] std::string fingerprint(const char* algorithm) const;
-    [[nodiscard]] static const char* algorithm_to_digest(FingerprintAlgorithm algorithm) const;
+    [[nodiscard]] static const char* algorithm_to_digest(FingerprintAlgorithm algorithm);
 
 };
 typedef std::shared_ptr<SSLKeypairCertificate> SSLKeypairCertificatePtr;
