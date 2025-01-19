@@ -283,13 +283,18 @@ std::string SSLKeypairCertificate::issuer() const
     return {buffer};
 }
 
-std::string SSLKeypairCertificate::fingerprint(const std::string& algorithm) const
+std::string SSLKeypairCertificate::fingerprint(const char* algorithm) const
 {
     std::uint32_t hash_size;
     auto buffer = std::vector<unsigned char>(EVP_MAX_MD_SIZE);
-    auto digest = EVP_get_digestbyname(algorithm.c_str());
+    auto digest = EVP_get_digestbyname(algorithm);
     X509_digest(certificate_, digest, &buffer[0], &hash_size);
     return fmt::format("{:02x}", fmt::join(buffer.cbegin(), buffer.cbegin() + hash_size, ":"));
+}
+
+std::string SSLKeypairCertificate::fingerprint(const std::string& algorithm) const
+{
+    return fingerprint(algorithm.c_str());
 }
 
 std::string SSLKeypairCertificate::sha1_fingerprint() const

@@ -72,6 +72,7 @@ class SSLKeypairCertificate : public KeypairCertificate
     [[nodiscard]] std::string subject_name() const;
     [[nodiscard]] std::string subject_common_name() const;
     [[nodiscard]] std::string issuer() const;
+    [[nodiscard]] std::string fingerprint(const char* algorithm) const;
     [[nodiscard]] std::string fingerprint(const std::string& algorithm) const;
     [[nodiscard]] std::string sha1_fingerprint() const;
     [[nodiscard]] std::string sha256_fingerprint() const;
