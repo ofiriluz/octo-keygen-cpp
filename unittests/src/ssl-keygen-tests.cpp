@@ -103,6 +103,10 @@ int main(int argc, char** argv)
     auto target = octo::keygen::ssl::SSLKeypairCertificate::load_certificate(
         std::make_unique<octo::encryption::SecureString>(TARGET_CERT)
     );
+    logger.info() << "Sha1 Fingerprint" << target->sha1_fingerprint();
+    logger.info() << "Sha256 Fingerprint" << target->sha256_fingerprint();
+    logger.info() << "md5 Fingerprint" << target->md5_fingerprint();
+
     auto chain = octo::keygen::ssl::SSLKeypairCertificateChain::load_certificate_chain(
         std::make_unique<octo::encryption::SecureString>(SUBCA)
     );
