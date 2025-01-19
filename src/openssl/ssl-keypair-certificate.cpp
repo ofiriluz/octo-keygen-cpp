@@ -297,7 +297,7 @@ std::string SSLKeypairCertificate::fingerprint(SSLKeypairCertificate::Fingerprin
     return fingerprint(algorithm_to_digest(algorithm));
 }
 
-std::string SSLKeypairCertificate::fingerprints(SSLKeypairCertificate::FingerprintAlgorithm algorithm) const
+std::unordered_map<std::string, std::string> SSLKeypairCertificate::fingerprints(SSLKeypairCertificate::FingerprintAlgorithm algorithm) const
 {
     return {{"SHA1", fingerprint(FingerprintAlgorithm::SHA1)},
             {"SHA256", fingerprint(FingerprintAlgorithm::SHA256)},
