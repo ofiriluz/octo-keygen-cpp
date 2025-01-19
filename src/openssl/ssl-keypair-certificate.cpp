@@ -318,21 +318,6 @@ const char* SSLKeypairCertificate::algorithm_to_digest(SSLKeypairCertificate::Fi
     throw std::runtime_error("Invalid fingerprint algorithm");
 }
 
-std::string SSLKeypairCertificate::sha1_fingerprint() const
-{
-    return fingerprint("sha1");
-}
-
-std::string SSLKeypairCertificate::sha256_fingerprint() const
-{
-    return fingerprint("sha256");
-}
-
-std::string SSLKeypairCertificate::md5_fingerprint() const
-{
-    return fingerprint("md5");
-}
-
 std::set<std::string> SSLKeypairCertificate::alternate_names() const
 {
     unsigned char* raw_cert_name = nullptr;
