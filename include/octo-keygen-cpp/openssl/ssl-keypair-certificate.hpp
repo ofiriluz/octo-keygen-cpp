@@ -82,9 +82,9 @@ class SSLKeypairCertificate : public KeypairCertificate
     [[nodiscard]] std::string subject_name() const;
     [[nodiscard]] std::string subject_common_name() const;
     [[nodiscard]] std::string issuer() const;
-    /// @brief Generates the fingerprint of the certificate
+    /// @brief Generates the fingerprint of the certificate by the requested algorithm
     [[nodiscard]] std::string fingerprint(FingerprintAlgorithm algorithm) const;
-    // @brief Generates all the fingerprints of the certificate
+    // @brief Generates all the fingerprints of the certificate with all supported algorithms
     [[nodiscard]] std::unordered_map<std::string, std::string> fingerprints() const;
 
     [[nodiscard]] std::set<std::string> alternate_names() const;
