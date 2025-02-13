@@ -17,6 +17,7 @@
 #include <octo-logger-cpp/logger.hpp>
 #include <regex>
 #include <set>
+#include <string_view>
 #include <unordered_map>
 
 typedef struct x509_st X509;
@@ -45,6 +46,9 @@ class SSLKeypairCertificate : public KeypairCertificate
     bool cert_ownership_;
     std::string identifier_;
 
+  private:
+    [[nodiscard]] std::string fingerprint(std::string_view algorithm) const noexcept(false);
+
   public:
     explicit SSLKeypairCertificate(X509* certificate = nullptr,
                                    bool cert_ownership = true,
@@ -60,6 +64,7 @@ class SSLKeypairCertificate : public KeypairCertificate
     static std::unique_ptr<SSLKeypairCertificate> load_certificate(encryption::SecureStringUniquePtr data,
                                                                    const std::string& identifier = "");
     static bool compare_certificates(const SSLKeypairCertificate* cert1, const SSLKeypairCertificate* cert2);
+    [[nodiscard]] static std::string_view algorithm_to_digest(FingerprintAlgorithm algorithm) noexcept(false);
 
     [[nodiscard]] bool add_certificate_extension(int nid, const std::string& value);
     [[nodiscard]] std::string get_certificate_extension(int nid);
@@ -92,10 +97,6 @@ class SSLKeypairCertificate : public KeypairCertificate
 
     friend class SSLKeygen;
     friend class SSLKeypairCertificateChain;
-
-  private:
-    [[nodiscard]] std::string fingerprint(const char* algorithm) const;
-    [[nodiscard]] static const char* algorithm_to_digest(FingerprintAlgorithm algorithm);
 };
 typedef std::shared_ptr<SSLKeypairCertificate> SSLKeypairCertificatePtr;
 typedef std::unique_ptr<SSLKeypairCertificate> SSLKeypairCertificateUniquePtr;

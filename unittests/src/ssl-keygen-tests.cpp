@@ -14,11 +14,12 @@
 #include "octo-keygen-cpp/openssl/ssl-keypair-certificate-chain.hpp"
 #include "octo-keygen-cpp/openssl/ssl-keypair-certificate.hpp"
 #include <octo-logger-cpp/manager.hpp>
-#include <iostream>
+#include <algorithm>
+#include <array>
 #include <fstream>
+#include <iostream>
+#include <string>
 
-using SSLKeypairCertificate = octo::keygen::ssl::SSLKeypairCertificate;
-using FingerprintAlgorithm = SSLKeypairCertificate::FingerprintAlgorithm;
 constexpr auto ROOTCA = "-----BEGIN CERTIFICATE-----\n"
                         "MIID4DCCAsigAwIBAgIUSdyfMTrtlHmyB8Jr3/q0YjizVCQwDQYJKoZIhvcNAQEN\n"
                         "BQAwfDELMAkGA1UEBhMCSUwxDzANBgNVBAgMBklzcmFlbDEUMBIGA1UEBwwLUGV0\n"
@@ -87,6 +88,8 @@ constexpr auto TARGET_CERT = "-----BEGIN CERTIFICATE-----\n"
 
 int main(int argc, char** argv)
 {
+    using namespace octo::keygen;
+
     octo::logger::Logger logger("PSKeygen");
     std::shared_ptr<octo::logger::ManagerConfig> config = std::make_shared<octo::logger::ManagerConfig>();
     octo::logger::SinkConfig console_writer_sink("Console", octo::logger::SinkConfig::SinkType::CONSOLE_SINK);
@@ -98,12 +101,21 @@ int main(int argc, char** argv)
         std::make_unique<octo::encryption::SecureString>(ROOTCA));
     auto target = octo::keygen::ssl::SSLKeypairCertificate::load_certificate(
         std::make_unique<octo::encryption::SecureString>(TARGET_CERT));
-    logger.info() << "SHA1 Fingerprint" << target->fingerprint(FingerprintAlgorithm::SHA1);
-    logger.info() << "SHA256 Fingerprint" << target->fingerprint(FingerprintAlgorithm::SHA256);
-    logger.info() << "MD5 Fingerprint" << target->fingerprint(FingerprintAlgorithm::MD5);
+
+    static std::array constexpr digests{
+        ssl::SSLKeypairCertificate::FingerprintAlgorithm::SHA1,
+        ssl::SSLKeypairCertificate::FingerprintAlgorithm::SHA256,
+        ssl::SSLKeypairCertificate::FingerprintAlgorithm::MD5,
+    };
+    for (auto const& itr : digests)
+    {
+        std::string print_name_upper(ssl::SSLKeypairCertificate::algorithm_to_digest(itr));
+        std::transform(print_name_upper.cbegin(), print_name_upper.cend(), print_name_upper.begin(), ::toupper);
+        logger.info().formatted("{} Fingerprint {}", print_name_upper, target->fingerprint(itr));
+    }
     for (const auto& [key, value] : target->fingerprints())
     {
-        logger.info() << key << " = " << value;
+        logger.info().formatted("{} = {}", key, value);
     }
 
     auto chain = octo::keygen::ssl::SSLKeypairCertificateChain::load_certificate_chain(
