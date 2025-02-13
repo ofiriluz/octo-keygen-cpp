@@ -1,5 +1,5 @@
 /**
- * @file ssl-keypair.hpp
+ * @file ssl-keypair-certificate.hpp
  * @author ofir iluz (iluzofir@gmail.com)
  * @brief
  * @version 0.1
@@ -32,8 +32,8 @@ class SSLKeypairCertificate : public KeypairCertificate
     enum class FingerprintAlgorithm : uint8_t
     {
         SHA1,
-        SHA256, 
-        MD5      
+        SHA256,
+        MD5,
     };
 
   private:
@@ -96,7 +96,6 @@ class SSLKeypairCertificate : public KeypairCertificate
   private:
     [[nodiscard]] std::string fingerprint(const char* algorithm) const;
     [[nodiscard]] static const char* algorithm_to_digest(FingerprintAlgorithm algorithm);
-
 };
 typedef std::shared_ptr<SSLKeypairCertificate> SSLKeypairCertificatePtr;
 typedef std::unique_ptr<SSLKeypairCertificate> SSLKeypairCertificateUniquePtr;
