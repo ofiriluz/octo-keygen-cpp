@@ -1,5 +1,5 @@
 /**
- * @file ssl-keypair.hpp
+ * @file ssl-keypair-certificate.hpp
  * @author ofir iluz (iluzofir@gmail.com)
  * @brief
  * @version 0.1
@@ -17,6 +17,8 @@
 #include <octo-logger-cpp/logger.hpp>
 #include <regex>
 #include <set>
+#include <string_view>
+#include <unordered_map>
 
 typedef struct x509_st X509;
 
@@ -24,8 +26,17 @@ namespace octo::keygen::ssl
 {
 static constexpr const char SSLKEYPAIRCERTIFICATE_TAG[] = "SSLKeypairCertificate";
 class SSLKeypairCertificateChain;
+
 class SSLKeypairCertificate : public KeypairCertificate
 {
+  public:
+    enum class FingerprintAlgorithm : uint8_t
+    {
+        SHA1,
+        SHA256,
+        MD5,
+    };
+
   private:
     static const std::regex PATTERNED_NAME_REGEX;
 
@@ -34,6 +45,9 @@ class SSLKeypairCertificate : public KeypairCertificate
     logger::Logger logger_;
     bool cert_ownership_;
     std::string identifier_;
+
+  private:
+    [[nodiscard]] std::string fingerprint(std::string_view algorithm) const noexcept(false);
 
   public:
     explicit SSLKeypairCertificate(X509* certificate = nullptr,
@@ -50,6 +64,7 @@ class SSLKeypairCertificate : public KeypairCertificate
     static std::unique_ptr<SSLKeypairCertificate> load_certificate(encryption::SecureStringUniquePtr data,
                                                                    const std::string& identifier = "");
     static bool compare_certificates(const SSLKeypairCertificate* cert1, const SSLKeypairCertificate* cert2);
+    [[nodiscard]] static std::string_view algorithm_to_digest(FingerprintAlgorithm algorithm) noexcept(false);
 
     [[nodiscard]] bool add_certificate_extension(int nid, const std::string& value);
     [[nodiscard]] std::string get_certificate_extension(int nid);
@@ -72,7 +87,11 @@ class SSLKeypairCertificate : public KeypairCertificate
     [[nodiscard]] std::string subject_name() const;
     [[nodiscard]] std::string subject_common_name() const;
     [[nodiscard]] std::string issuer() const;
-    [[nodiscard]] std::string fingerprint() const;
+    /// @brief Generates the fingerprint of the certificate by the requested algorithm
+    [[nodiscard]] std::string fingerprint(FingerprintAlgorithm algorithm) const;
+    // @brief Generates all the fingerprints of the certificate with all supported algorithms
+    [[nodiscard]] std::unordered_map<std::string, std::string> fingerprints() const;
+
     [[nodiscard]] std::set<std::string> alternate_names() const;
     [[nodiscard]] std::string identifier() const;
 

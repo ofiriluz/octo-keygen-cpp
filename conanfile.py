@@ -7,7 +7,7 @@ from conan.tools.scm import Version
 
 class OctoKeygenCPPConan(ConanFile):
     name = "octo-keygen-cpp"
-    version = "1.0.1"
+    version = "1.1.0"
     url = "https://github.com/ofiriluz/octo-keygen-cpp"
     author = "Ofir Iluz"
     settings = "os", "compiler", "build_type", "arch"

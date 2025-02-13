@@ -1,5 +1,5 @@
 /**
- * @file keypair-certificate.cpp
+ * @file ssl-keypair-certificate.cpp
  * @author ofir iluz (iluzofir@gmail.com)
  * @brief
  * @version 0.1
@@ -61,7 +61,7 @@ std::string SSLKeypairCertificate::certificate() const
     }
 
     int cert_len = BIO_pending(certbio.get());
-    char* cert = (char*)malloc(cert_len + 1);
+    char* cert = static_cast<char*>(malloc(cert_len + 1));
     if (!BIO_read(certbio.get(), cert, cert_len))
     {
         free(cert);
@@ -90,7 +90,7 @@ std::string SSLKeypairCertificate::pretty_print_certificate_info() const
     }
 
     int cert_len = BIO_pending(certbio.get());
-    char* cert = (char*)malloc(cert_len + 1);
+    char* cert = static_cast<char*>(malloc(cert_len + 1));
     if (!BIO_read(certbio.get(), cert, cert_len))
     {
         free(cert);
@@ -114,7 +114,7 @@ std::string SSLKeypairCertificate::pem_certificate() const
     }
 
     int cert_len = BIO_pending(certbio.get());
-    char* cert = (char*)malloc(cert_len + 1);
+    char* cert = static_cast<char*>(malloc(cert_len + 1));
     if (!BIO_read(certbio.get(), cert, cert_len))
     {
         free(cert);
@@ -283,13 +283,44 @@ std::string SSLKeypairCertificate::issuer() const
     return {buffer};
 }
 
-std::string SSLKeypairCertificate::fingerprint() const
+std::string SSLKeypairCertificate::fingerprint(std::string_view algorithm) const noexcept(false)
 {
     std::uint32_t hash_size;
-    auto buffer = std::vector<unsigned char>(EVP_MAX_MD_SIZE);
-    auto digest = EVP_get_digestbyname("sha256");
+    std::vector<unsigned char> buffer(EVP_MAX_MD_SIZE);
+    auto digest = EVP_get_digestbyname(algorithm.data());
+    if (!digest)
+    {
+        throw std::runtime_error("Invalid fingerprint algorithm");
+    }
     X509_digest(certificate_, digest, &buffer[0], &hash_size);
     return fmt::format("{:02x}", fmt::join(buffer.cbegin(), buffer.cbegin() + hash_size, ":"));
+}
+
+std::string SSLKeypairCertificate::fingerprint(SSLKeypairCertificate::FingerprintAlgorithm algorithm) const
+{
+    return fingerprint(algorithm_to_digest(algorithm));
+}
+
+std::unordered_map<std::string, std::string> SSLKeypairCertificate::fingerprints() const
+{
+    return {{"SHA1", fingerprint(FingerprintAlgorithm::SHA1)},
+            {"SHA256", fingerprint(FingerprintAlgorithm::SHA256)},
+            {"MD5", fingerprint(FingerprintAlgorithm::MD5)}};
+}
+
+std::string_view SSLKeypairCertificate::algorithm_to_digest(
+    SSLKeypairCertificate::FingerprintAlgorithm algorithm) noexcept(false)
+{
+    switch (algorithm)
+    {
+        case FingerprintAlgorithm::SHA1:
+            return "sha1";
+        case FingerprintAlgorithm::SHA256:
+            return "sha256";
+        case FingerprintAlgorithm::MD5:
+            return "md5";
+    }
+    throw std::runtime_error("Invalid fingerprint algorithm");
 }
 
 std::set<std::string> SSLKeypairCertificate::alternate_names() const
@@ -442,7 +473,7 @@ std::string SSLKeypairCertificate::get_extension(X509* certificate, int nid)
     }
     BIO_flush(bio.get());
     BIO_get_mem_ptr(bio.get(), &bptr);
-    buf = (char*)malloc((bptr->length + 1) * sizeof(char));
+    buf = static_cast<char*>(malloc((bptr->length + 1) * sizeof(char)));
     std::memcpy(buf, bptr->data, bptr->length);
     buf[bptr->length] = '\0';
 
