@@ -47,7 +47,7 @@ class OctoKeygenCPPConan(ConanFile):
             raise ConanInvalidConfiguration(f"{self.name} does not support MSVC MT/MTd configurations, only MD/MDd is supported")
 
     def requirements(self):
-        self.requires("octo-logger-cpp/1.1.0")
+        self.requires("octo-logger-cpp/2.3.0")
         self.requires("octo-encryption-cpp/1.1.0")
         self.requires("fmt/9.0.0")
         self.requires("openssl/1.1.1q")
