@@ -283,29 +283,42 @@ std::string SSLKeypairCertificate::issuer() const
     return {buffer};
 }
 
-std::string SSLKeypairCertificate::fingerprint(std::string_view algorithm) const noexcept(false)
+std::string SSLKeypairCertificate::fingerprint(std::string_view algorithm, std::string_view separator) const
+    noexcept(false)
 {
     std::uint32_t hash_size;
     std::vector<unsigned char> buffer(EVP_MAX_MD_SIZE);
-    auto digest = EVP_get_digestbyname(algorithm.data());
+    auto const digest = EVP_get_digestbyname(algorithm.data());
     if (!digest)
     {
         throw std::runtime_error("Invalid fingerprint algorithm");
     }
     X509_digest(certificate_, digest, &buffer[0], &hash_size);
-    return fmt::format("{:02x}", fmt::join(buffer.cbegin(), buffer.cbegin() + hash_size, ":"));
+    return fmt::format("{:02x}", fmt::join(buffer.cbegin(), buffer.cbegin() + hash_size, separator));
 }
 
-std::string SSLKeypairCertificate::fingerprint(SSLKeypairCertificate::FingerprintAlgorithm algorithm) const
+std::string SSLKeypairCertificate::fingerprint(SSLKeypairCertificate::FingerprintAlgorithm algorithm,
+                                               std::string_view separator) const
 {
-    return fingerprint(algorithm_to_digest(algorithm));
+    return fingerprint(algorithm_to_digest(algorithm), separator);
 }
 
-std::unordered_map<std::string, std::string> SSLKeypairCertificate::fingerprints() const
+std::unordered_map<std::string, std::string> SSLKeypairCertificate::fingerprints(std::string_view separator) const
 {
-    return {{"SHA1", fingerprint(FingerprintAlgorithm::SHA1)},
-            {"SHA256", fingerprint(FingerprintAlgorithm::SHA256)},
-            {"MD5", fingerprint(FingerprintAlgorithm::MD5)}};
+    static auto constexpr algorithms = {
+        FingerprintAlgorithm::SHA1, FingerprintAlgorithm::SHA256, FingerprintAlgorithm::MD5};
+    return fingerprints(algorithms, separator);
+}
+
+std::unordered_map<std::string, std::string> SSLKeypairCertificate::fingerprints(
+    std::unordered_set<FingerprintAlgorithm> const& algorithms, std::string_view separator) const
+{
+    std::unordered_map<std::string, std::string> fingerprints;
+    for (auto const& algorithm : algorithms)
+    {
+        fingerprints.emplace(algorithm_to_digest(algorithm), fingerprint(algorithm, separator));
+    }
+    return fingerprints;
 }
 
 std::string_view SSLKeypairCertificate::algorithm_to_digest(

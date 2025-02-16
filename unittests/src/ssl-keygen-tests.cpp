@@ -102,20 +102,39 @@ int main(int argc, char** argv)
     auto target = octo::keygen::ssl::SSLKeypairCertificate::load_certificate(
         std::make_unique<octo::encryption::SecureString>(TARGET_CERT));
 
-    static std::array constexpr digests{
-        ssl::SSLKeypairCertificate::FingerprintAlgorithm::SHA1,
-        ssl::SSLKeypairCertificate::FingerprintAlgorithm::SHA256,
-        ssl::SSLKeypairCertificate::FingerprintAlgorithm::MD5,
+    static std::array constexpr digests_separators{
+        ssl::SSLKeypairCertificate::DEFAULT_FINGERPRINT_SEPARATOR.data(), // Default is ":".
+        "",
+        "-",
+        ",",
     };
-    for (auto const& itr : digests)
+    for (auto const& separator : digests_separators)
     {
-        std::string print_name_upper(ssl::SSLKeypairCertificate::algorithm_to_digest(itr));
-        std::transform(print_name_upper.cbegin(), print_name_upper.cend(), print_name_upper.begin(), ::toupper);
-        logger.info().formatted("{} Fingerprint {}", print_name_upper, target->fingerprint(itr));
-    }
-    for (const auto& [key, value] : target->fingerprints())
-    {
-        logger.info().formatted("{} = {}", key, value);
+        logger.info().formatted("Fingerprint with separator '{}'", separator);
+        static std::array constexpr digests{
+            ssl::SSLKeypairCertificate::FingerprintAlgorithm::SHA1,
+            ssl::SSLKeypairCertificate::FingerprintAlgorithm::SHA256,
+            ssl::SSLKeypairCertificate::FingerprintAlgorithm::MD5,
+        };
+        static std::unordered_set const digests_set{
+            ssl::SSLKeypairCertificate::FingerprintAlgorithm::SHA1,
+            ssl::SSLKeypairCertificate::FingerprintAlgorithm::SHA256,
+            ssl::SSLKeypairCertificate::FingerprintAlgorithm::MD5,
+        };
+        for (auto const& itr : digests)
+        {
+            std::string print_name_upper(ssl::SSLKeypairCertificate::algorithm_to_digest(itr));
+            std::transform(print_name_upper.cbegin(), print_name_upper.cend(), print_name_upper.begin(), ::toupper);
+            logger.info().formatted("{} Fingerprint {}", print_name_upper, target->fingerprint(itr, separator));
+        }
+        for (const auto& [key, value] : target->fingerprints(separator))
+        {
+            logger.info().formatted("{} = {}", key, value);
+        }
+        for (const auto& [key, value] : target->fingerprints(digests_set, separator))
+        {
+            logger.info().formatted("{} = {}", key, value);
+        }
     }
 
     auto chain = octo::keygen::ssl::SSLKeypairCertificateChain::load_certificate_chain(

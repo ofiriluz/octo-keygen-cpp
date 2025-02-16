@@ -19,6 +19,7 @@
 #include <set>
 #include <string_view>
 #include <unordered_map>
+#include <unordered_set>
 
 typedef struct x509_st X509;
 
@@ -37,6 +38,9 @@ class SSLKeypairCertificate : public KeypairCertificate
         MD5,
     };
 
+    /// @brief The default separator for the fingerprint octets.
+    static std::string_view constexpr DEFAULT_FINGERPRINT_SEPARATOR = ":";
+
   private:
     static const std::regex PATTERNED_NAME_REGEX;
 
@@ -47,7 +51,7 @@ class SSLKeypairCertificate : public KeypairCertificate
     std::string identifier_;
 
   private:
-    [[nodiscard]] std::string fingerprint(std::string_view algorithm) const noexcept(false);
+    [[nodiscard]] std::string fingerprint(std::string_view algorithm, std::string_view separator) const noexcept(false);
 
   public:
     explicit SSLKeypairCertificate(X509* certificate = nullptr,
@@ -88,9 +92,15 @@ class SSLKeypairCertificate : public KeypairCertificate
     [[nodiscard]] std::string subject_common_name() const;
     [[nodiscard]] std::string issuer() const;
     /// @brief Generates the fingerprint of the certificate by the requested algorithm
-    [[nodiscard]] std::string fingerprint(FingerprintAlgorithm algorithm) const;
-    // @brief Generates all the fingerprints of the certificate with all supported algorithms
-    [[nodiscard]] std::unordered_map<std::string, std::string> fingerprints() const;
+    [[nodiscard]] std::string fingerprint(FingerprintAlgorithm algorithm,
+                                          std::string_view separator = DEFAULT_FINGERPRINT_SEPARATOR) const;
+    /// @brief Generates all the fingerprints of the certificate with all supported algorithms
+    [[nodiscard]] std::unordered_map<std::string, std::string> fingerprints(
+        std::string_view separator = DEFAULT_FINGERPRINT_SEPARATOR) const;
+    /// @brief Generates all the fingerprints of the certificate with the requested algorithms
+    [[nodiscard]] std::unordered_map<std::string, std::string> fingerprints(
+        std::unordered_set<FingerprintAlgorithm> const& algorithms,
+        std::string_view separator = DEFAULT_FINGERPRINT_SEPARATOR) const;
 
     [[nodiscard]] std::set<std::string> alternate_names() const;
     [[nodiscard]] std::string identifier() const;
