@@ -87,7 +87,9 @@ class SSLKeypairCertificate : public KeypairCertificate
     [[nodiscard]] bool is_server_ca() const;
     [[nodiscard]] bool is_any_ca() const;
     [[nodiscard]] bool is_ca() const;
-    [[nodiscard]] bool is_valid_hostname(const std::string& hostname) const;
+    [[nodiscard]] bool is_valid_hostname(std::string hostname,
+                                         bool allow_common_name = true,
+                                         bool case_insensitive_comparison = false) const;
     [[nodiscard]] std::string subject_name() const;
     [[nodiscard]] std::string subject_common_name() const;
     [[nodiscard]] std::string issuer() const;
