@@ -156,19 +156,40 @@ bool SSLKeypairCertificate::is_ca() const
     return is_client_ca() || is_server_ca() || is_any_ca();
 }
 
-bool SSLKeypairCertificate::is_valid_hostname(const std::string& hostname) const
+bool SSLKeypairCertificate::is_valid_hostname(std::string hostname,
+                                              bool allow_common_name,
+                                              bool case_insensitive_comparison) const
 {
     // Get certificate subject common name and alternate names
-    auto const hostname_without_machine = hostname.substr(hostname.find_first_of('.') + 1, hostname.size());
+    auto hostname_without_machine = hostname.substr(hostname.find_first_of('.') + 1, hostname.size());
     auto alternate_names_patterns = alternate_names();
-    alternate_names_patterns.insert(alternate_names_patterns.begin(), subject_name());
-    alternate_names_patterns.insert(alternate_names_patterns.begin(), subject_common_name());
+    if (allow_common_name)
+    {
+        alternate_names_patterns.insert(alternate_names_patterns.begin(), subject_name());
+        alternate_names_patterns.insert(alternate_names_patterns.begin(), subject_common_name());
+    }
+    if (case_insensitive_comparison)
+    {
+        // Convert hostname and patterns to lowercase for case-insensitive comparison
+        std::transform(hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
+        std::transform(hostname_without_machine.begin(), hostname_without_machine.end(), hostname_without_machine.begin(), ::tolower);
+        std::set<std::string> lowercase_patterns;
+        for (const auto& pattern : alternate_names_patterns)
+        {
+            std::string lowercase_pattern = pattern;
+            std::transform(lowercase_pattern.begin(), lowercase_pattern.end(), lowercase_pattern.begin(), ::tolower);
+            lowercase_patterns.insert(std::move(lowercase_pattern));
+        }
+        alternate_names_patterns = std::move(lowercase_patterns);
+    }
     logger_.info(identifier_)
         .formatted("Checking if certificate is valid against hostname [{}] or hostname without machine [{}] "
-                   "with alternate names [{}]",
+                   "with alternate names [{}] and with allow_common_name [{}] and case_insensitive_comparison [{}]",
                    hostname,
                    hostname_without_machine,
-                   fmt::format("{}", fmt::join(alternate_names_patterns, ", ")));
+                   fmt::format("{}", fmt::join(alternate_names_patterns, ", ")),
+                   allow_common_name,
+                   case_insensitive_comparison);
 
     // Check if any pattern matches the hostname
     return std::any_of(
