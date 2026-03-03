@@ -383,9 +383,9 @@ std::set<std::string> SSLKeypairCertificate::alternate_names() const
                 auto cert_name = std::string(reinterpret_cast<const char*>(raw_cert_name),
                                              strlen(reinterpret_cast<const char*>(raw_cert_name)));
                 // Check if FQDN ends with "." since it is valid and we can ignore the dot
-                if (cert_name[cert_name.size() - 1] == '.')
+                if (!cert_name.empty() && cert_name.back() == '.')
                 {
-                    cert_name[cert_name.size() - 1] = '\0';
+                    cert_name.pop_back();
                 }
                 // Add to the final list of alternate names
                 sans.emplace(cert_name);
