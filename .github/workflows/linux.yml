@@ -1,6 +1,6 @@
 name: linux
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 permissions:
   contents: read
@@ -8,6 +8,9 @@ permissions:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    env:
+      CC: gcc-11
+      CXX: g++-11
     strategy:
       matrix:
         build_type: [Debug, Release]
@@ -16,23 +19,40 @@ jobs:
     - uses: actions/checkout@v3
     - name: Create Build Environment
       run: |
-        ${{matrix.install}}
         sudo apt update
-        sudo apt install locales-all g++-10
+        sudo apt install -y locales-all gcc-11 g++-11
         cmake -E make_directory ${{runner.workspace}}/build
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: "3.8"
+        python-version: "3.10"
     - name: Install Conan
       run: |
         pip3 install "conan<2"
+    - name: Configure Conan profile
+      run: |
+        conan profile new default --detect
+        conan profile update settings.compiler=gcc default
+        conan profile update settings.compiler.version=11 default
+        conan profile update settings.compiler.libcxx=libstdc++11 default
+        conan profile update settings.compiler.cppstd=17 default
+        conan profile update settings.build_type=${{matrix.build_type}} default
+        conan profile update env.CC=gcc-11 default
+        conan profile update env.CXX=g++-11 default
+        conan profile show default
+    - name: Build dependency octo-logger-cpp from source
+      working-directory: ${{runner.workspace}}
+      env:
+        OCTO_LOGGER_CPP_VERSION: 2.5.2
+      run: |
+        git clone --depth 1 --branch "v${OCTO_LOGGER_CPP_VERSION}" \
+          https://github.com/ofiriluz/octo-logger-cpp.git octo-logger-cpp-src
+        conan create octo-logger-cpp-src --build=missing \
+          -s build_type=${{matrix.build_type}}
     - name: Consume conan
       working-directory: ${{runner.workspace}}/build
       run: |
-        conan profile new default --detect
-        conan profile update settings.build_type=${{matrix.build_type}} default
-        conan install $GITHUB_WORKSPACE
+        conan install $GITHUB_WORKSPACE --build=missing
     - name: Build and test conan
       working-directory: ${{runner.workspace}}/build
       run: |

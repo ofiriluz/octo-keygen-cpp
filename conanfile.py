@@ -7,7 +7,7 @@ from conan.tools.scm import Version
 
 class OctoKeygenCPPConan(ConanFile):
     name = "octo-keygen-cpp"
-    version = "1.1.3"
+    version = "1.1.4"
     url = "https://github.com/ofiriluz/octo-keygen-cpp"
     author = "Ofir Iluz"
     settings = "os", "compiler", "build_type", "arch"
@@ -47,7 +47,7 @@ class OctoKeygenCPPConan(ConanFile):
             raise ConanInvalidConfiguration(f"{self.name} does not support MSVC MT/MTd configurations, only MD/MDd is supported")
 
     def requirements(self):
-        self.requires("octo-logger-cpp/2.3.3")
+        self.requires("octo-logger-cpp/2.5.2")
         self.requires("octo-encryption-cpp/1.1.0")
         self.requires("fmt/9.0.0")
         self.requires("openssl/1.1.1q")

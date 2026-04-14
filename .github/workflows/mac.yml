@@ -23,13 +23,24 @@ jobs:
         python-version: "3.8"
     - name: Install Conan
       run: |
-        pip3 install conan
-    - name: Consume conan
-      working-directory: ${{runner.workspace}}/build
+        pip3 install "conan<2"
+    - name: Configure Conan profile
       run: |
         conan profile new default --detect
         conan profile update settings.build_type=${{matrix.build_type}} default
-        conan install $GITHUB_WORKSPACE
+    - name: Build dependency octo-logger-cpp from source
+      working-directory: ${{runner.workspace}}
+      env:
+        OCTO_LOGGER_CPP_VERSION: 2.5.2
+      run: |
+        git clone --depth 1 --branch "v${OCTO_LOGGER_CPP_VERSION}" \
+          https://github.com/ofiriluz/octo-logger-cpp.git octo-logger-cpp-src
+        conan create octo-logger-cpp-src --build=missing \
+          -s build_type=${{matrix.build_type}}
+    - name: Consume conan
+      working-directory: ${{runner.workspace}}/build
+      run: |
+        conan install $GITHUB_WORKSPACE --build=missing
     - name: Build and test conan
       working-directory: ${{runner.workspace}}/build
       run: |
